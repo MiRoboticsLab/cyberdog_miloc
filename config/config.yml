@@ -1,0 +1,40 @@
+cyberdog_calibr_path:
+  /SDCARD/calibrate_result.yaml
+
+map_path:
+  /SDCARD/miloc/maps
+
+map_table_name:
+  reloc_map
+
+position_threshold: 1.0
+confidence: [1.0, 0.9, 0.8, 0.7, 0.6, 0.3]
+
+traj_from_visual: true
+mapper_params:
+  ## image filter params
+  translation_interval: 0.15   # m
+  orientation_interval: 0.3490 # rad
+
+  ## point filter params
+  max_reproj_error: 2.0
+  min_tri_angle: 5.0
+  min_track_len: 2.0
+
+  num_matched: 5 # pairs num
+
+model_path:
+  local_model_path:
+    /SDCARD/miloc/models/local_model.trt
+  global_model_path:
+    /SDCARD/miloc/models/global_model.trt
+  match_model_path:
+    /SDCARD/miloc/models/match_model.trt
+
+local_model_params:
+  mask_th: 0.22
+
+reloc_params:
+  retrieval_num: 10
+  inlier_num: 10
+  ransac_thresh: 12
