@@ -55,6 +55,10 @@ typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image,
     sensor_msgs::msg::Image> ImageSyncPolicyTriple;
 typedef message_filters::Synchronizer<ImageSyncPolicyTriple> ImageSyncTriple;
 
+/**
+ * @brief miloc_server node class 
+ * 
+ */
 class MilocServer : public rclcpp::Node
 {
 public:
@@ -80,7 +84,13 @@ public:
 
 private:
   void MilocStatusCallback();
-
+  /**
+   * @brief Subscribe Triple Camreas
+   * 
+   * @param msg_front 
+   * @param msg_left 
+   * @param msg_right 
+   */
   void TripleCameraCallback(
     const sensor_msgs::msg::Image::ConstSharedPtr msg_front,
     const sensor_msgs::msg::Image::ConstSharedPtr msg_left,
@@ -91,42 +101,62 @@ private:
 
   void OdometryLegCallback(
     const nav_msgs::msg::Odometry::ConstSharedPtr msg_odom);
-
+  /**
+   * @brief reloc interface, response the robot pose
+   */
   void RelocCallback(
     const std::shared_ptr<cyberdog_visions_interfaces::srv::Reloc::Request> request,
     const std::shared_ptr<cyberdog_visions_interfaces::srv::Reloc::Response> response);
-
+  /**
+   * @brief change miloc status to mappble and start to collect images
+   */
   void CreateMapCallback(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
     const std::shared_ptr<std_srvs::srv::SetBool::Response> response);
-
+  /**
+   * @brief stop collecting images and start to reconstruct reloc map
+   */
   void FinishMapCallback(
     const std::shared_ptr<cyberdog_visions_interfaces::srv::FinishMap::Request> request,
     const std::shared_ptr<cyberdog_visions_interfaces::srv::FinishMap::Response> response);
-
+  /**
+   * @brief preparing for reloc include load reloc map, reloc models and subscribe images
+   */
   void StartNavigationCallback(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
     const std::shared_ptr<std_srvs::srv::SetBool::Response> response);
-
+  /**
+   * @brief release map, models and unsubscribe images
+   */
   void StopNavigationCallback(
     const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
     const std::shared_ptr<std_srvs::srv::SetBool::Response> response);
-
+  /**
+   * @brief delete reloc map interface
+   */
   void DeleteMapCallback(
     const std::shared_ptr<cyberdog_visions_interfaces::srv::MilocMapHandler::Request> request,
     const std::shared_ptr<cyberdog_visions_interfaces::srv::MilocMapHandler::Response> response);
-
+  /**
+   * @brief check reloc map is available or not
+   */
   void GetMapStatusCallback(
     const std::shared_ptr<cyberdog_visions_interfaces::srv::MilocMapHandler::Request> request,
     const std::shared_ptr<cyberdog_visions_interfaces::srv::MilocMapHandler::Response> response);
-
+  /**
+   * @brief download reloc models online
+   */
   void ModelDownloadCallback(const protocol::msg::ConnectorStatus::SharedPtr msg);
 
-  // Collect image and pose data
   void CollectImage();
 
   void CollectPose();
-
+  /**
+   * @brief check the model version is available or not
+   * 
+   * @return 1 for check success
+   * @return 0 for check fail 
+   */
   int ModelCheck();
 
   std::deque<ImgData> img_buffer_;
@@ -175,8 +205,8 @@ private:
 
   std::shared_ptr<MilocApi> miloc_api_;
 
-  int current_map_id;
-  int create_map_id;
+  int current_map_id_;
+  int create_map_id_;
 };  // class MilocServer
 
 }  // namespace miloc

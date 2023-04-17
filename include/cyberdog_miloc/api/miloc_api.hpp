@@ -37,25 +37,47 @@ namespace miloc
 #define SLAM_BAD_ARG              (-5)        // arg/param is bad
 #define SLAM_BAD_OPT              (-6)        // bad operation
 
+/**
+ * @brief miloc core api
+ * 
+ */
 class MilocApi
 {
 public:
-  // Start up Miloc service
+  /**
+   * @brief Start up Miloc service
+   * 
+   * @param config_file config file path
+   * @return SLAM_OK for startup success and others for startup fail
+   */
   int StartUp(const std::string & config_file);
-
-  // Choose visual or laser SLAM system
+  /**
+   * @brief Choose visual or laser SLAM system
+   * 
+   * @param visual_slam 1 for visual_slam 0 for laser slam
+   * @return SLAM_OK for startup success and others for startup fail 
+   */
   int SetSLAM(bool visual_slam);
 
   // get current SLAM system
   bool GetSLAM();
-
+  
   int DeleteRelocMap(int map_id);
 
   int GetRelocMapStatus(int map_id);
 
-  // Estimate current pose with images and camera info
-  //      camera_idxs stands for which camera capture the image
-  //      orientation, position is the pose output, inline_num is the inline number
+  /**
+   * @brief Estimate current pose with images and camera info
+   * 
+   * @param images input triple camrea images
+   * @param orientation one output of the current pose
+   * @param position one output of the current pose
+   * @param orientation_init input orientation from slam system
+   * @param position_init input position from slam system
+   * @param reply_status output status defined in base/miloc_types.hpp
+   * @param confidence output confidence of current pose
+   * @return SLAM_OK for startup success and others for startup fail 
+   */
   int EstimatePose(
     const std::vector<cv::Mat> & images, Eigen::Quaterniond & orientation,
     Eigen::Vector3d & position,
@@ -74,13 +96,19 @@ public:
   // Stop navigating
   int StopNavigation();
 
-  // Collect images
-  //        timastamp is for current images, camera_idxs stands for which camera capture the images
+  /**
+   * @brief Collect images
+   * 
+   * @param timestamp  current images timastamp
+   * @param images current images data
+   * @param camera_idxs camera_idxs
+   * @return SLAM_OK for startup success and others for startup fail
+   */
   int CollectImage(
     uint64_t timestamp, const std::vector<cv::Mat> & images,
     const std::vector<int> & camera_idxs);
 
-  // Get current server status
+  // Get current miloc server status
   int GetMilocStatus();
 
   // Get current map id
@@ -88,7 +116,13 @@ public:
 
   // Shut down Miloc service
   int ShutDown();
-
+  /**
+   * @brief reconstruct map
+   * 
+   * @param map_id 
+   * @param map_name 
+   * @return SLAM_OK for startup success and others for startup fail
+   */
   int ReconstructMap(const int map_id, const std::string & map_name);
 };  // class MilocApi
 }  // namespace miloc

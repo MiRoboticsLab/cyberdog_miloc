@@ -51,7 +51,7 @@ int MilocServer::Init()
 
   int ret = miloc_api_->StartUp(config_path);
 
-  current_map_id = -1;
+  current_map_id_ = -1;
 
   miloc_status_timer_ =
     this->create_wall_timer(1s, std::bind(&MilocServer::MilocStatusCallback, this));
@@ -542,8 +542,8 @@ void MilocServer::CreateMapCallback(
   } else {
     INFO("miloc work with laser slam");
   }
-  miloc_api_->CreateMap(current_map_id);
-  create_map_id = current_map_id;
+  miloc_api_->CreateMap(current_map_id_);
+  create_map_id_ = current_map_id_;
 
   response->success = true;
   response->message = "Begin to create map";
@@ -575,8 +575,8 @@ void MilocServer::FinishMapCallback(
   if (request->finish && !request->map_name.empty() && immediately_reconstruct_) {
     if (MilocStatus::kINACTIVE == miloc_api_->GetMilocStatus()) {
       if (ModelCheck() == SLAM_OK) {
-        int ret = miloc_api_->ReconstructMap(create_map_id, "");
-        create_map_id = -1;
+        int ret = miloc_api_->ReconstructMap(create_map_id_, "");
+        create_map_id_ = -1;
         if (SLAM_OK == ret) {
           reconstruct_success = true;
           INFO("Start to reconstruct");
