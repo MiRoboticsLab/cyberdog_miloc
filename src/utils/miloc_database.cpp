@@ -34,32 +34,32 @@ namespace miloc
 #define TABLE_MACRO
 #ifdef TABLE_MACRO
 #define CREATE_CAMERAS_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS cameras (\
+  "CREATE TABLE IF NOT EXISTS cameras (\
 camera_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \
 model INTEGER NOT NULL, \
 width INTEGER NOT NULL, \
 height INTEGER NOT NULL, \
 params BLOB, \
-prior_focal_length INTEGER NOT NULL);)"
+prior_focal_length INTEGER NOT NULL);"
 
 #define CREATE_DESCRIPTORS_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS descriptors (\
+  "CREATE TABLE IF NOT EXISTS descriptors (\
 image_id INTEGER PRIMARY KEY NOT NULL, \
 rows INTEGER NOT NULL, \
 cols INTEGER NOT NULL, \
 data BLOB, \
-FOREIGN KEY(image_id) REFERENCES images(image_id) ON DELETE CASCADE);)"
+FOREIGN KEY(image_id) REFERENCES images(image_id) ON DELETE CASCADE);"
 
 #define CREATE_SCORES_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS scores (\
+  "CREATE TABLE IF NOT EXISTS scores (\
 image_id INTEGER PRIMARY KEY NOT NULL, \
 rows INTEGER NOT NULL, \
 cols INTEGER NOT NULL, \
 data BLOB, \
-FOREIGN KEY(image_id) REFERENCES images(image_id) ON DELETE CASCADE);)"
+FOREIGN KEY(image_id) REFERENCES images(image_id) ON DELETE CASCADE);"
 
 #define CREATE_IMAGES_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS images (\
+  "CREATE TABLE IF NOT EXISTS images (\
 image_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \
 name TEXT NOT NULL UNIQUE, \
 camera_id INTEGER NOT NULL, \
@@ -71,10 +71,10 @@ prior_tx REAL, \
 prior_ty REAL, \
 prior_tz REAL, \
 light INTERGER, \
-FOREIGN KEY(camera_id) REFERENCES cameras(camera_id));)"
+FOREIGN KEY(camera_id) REFERENCES cameras(camera_id));"
 
 #define CREATE_TWO_VIEW_GEOMETRIES_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS two_view_geometries (\
+  "CREATE TABLE IF NOT EXISTS two_view_geometries (\
 pair_id INTEGER PRIMARY KEY NOT NULL, \
 rows INTEGER NOT NULL, \
 cols INTEGER NOT NULL, \
@@ -84,27 +84,27 @@ F BLOB, \
 E BLOB, \
 H BLOB, \
 qvec BLOB, \
-tvec BLOB);)"
+tvec BLOB);"
 
 #define CREATE_KEYPOINTS_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS keypoints (\
+  "CREATE TABLE IF NOT EXISTS keypoints (\
 image_id INTEGER PRIMARY KEY NOT NULL, \
 rows INTEGER NOT NULL, \
 cols INTEGER NOT NULL, \
 data BLOB, \
-FOREIGN KEY(image_id) REFERENCES images(image_id) ON DELETE CASCADE);)"
+FOREIGN KEY(image_id) REFERENCES images(image_id) ON DELETE CASCADE);"
 
 #define CREATE_MATCHES_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS matches (\
+  "CREATE TABLE IF NOT EXISTS matches (\
 pair_id INTEGER PRIMARY KEY NOT NULL, \
 rows INTEGER NOT NULL, \
 cols INTEGER NOT NULL, \
-data BLOB);)"
+data BLOB);"
 
 #define CREATE_NAME_INDEX "CREATE UNIQUE INDEX IF NOT EXISTS index_name ON images(name);"
 
 #define CREATE_RELOCMAP_TABLE \
-  R"(CREATE TABLE IF NOT EXISTS reloc_map (\
+  "CREATE TABLE IF NOT EXISTS reloc_map (\
 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \
 name STRING NOT NULL, \
 height FLOAT NOT NULL, \
@@ -116,7 +116,7 @@ update_time INTERGER NOT NULL, \
 status INTERGER NOT NULL, \
 scene INTERGER NOT NULL, \
 slam  INTERGER NOT NULL, \
-introduction STRING NOT NULL);)"
+introduction STRING NOT NULL);"
 
 #endif
 
