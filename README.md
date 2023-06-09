@@ -8,7 +8,7 @@ Ubuntu 18.04/20.04
 ### Ros
 ROS2:galactic
 ### Deep learning
-Depend on Jetpad 4.6，includ CUDA 10.2、cuDNN 8.2.1、TensorRT 8.0.1
+Depend on Jetpack 4.6，include CUDA 10.2、cuDNN 8.2.1、TensorRT 8.0.1
 ### others 
 - OpenCV 4.2.0
 - yaml-cpp
@@ -19,7 +19,7 @@ Depend on Jetpad 4.6，includ CUDA 10.2、cuDNN 8.2.1、TensorRT 8.0.1
 ## Build Cyberdog_miloc
 
 ```shell
-colcon build -merge-install --install-base /opt/ros2/cyberdog
+colcon build --merge-install --install-base /opt/ros2/cyberdog
 ```
 
 ## RUN
@@ -32,7 +32,7 @@ miloc_server will check and update the deep learning model when it is connected 
 
 - Mapping mode
 
-depend on cyberdog_occmap、MIVINS、and camera images
+depend on cyberdog_occmap、cyberdog_mivins、and camera images
 
 - Reloc mode
 
