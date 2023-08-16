@@ -20,6 +20,7 @@
 #include <utility>
 #include <memory>
 #include <chrono>
+#include <malloc.h>
 
 #include <boost/filesystem.hpp>
 #include <glog/logging.h>
@@ -29,6 +30,7 @@
 #include "utils/miloc_basic.hpp"
 #include "base/miloc_colmap_helper.hpp"
 #include "utils/miloc_convertor.hpp"
+#include "cuda_runtime.h"
 
 namespace cyberdog
 {
@@ -221,6 +223,11 @@ int MiLocServicer::InitServer(const std::string & config_file)
 
 int MiLocServicer::LoadModel()
 {
+  if (is_model_loaded_){
+    LOG(INFO) << "model is already loaded";
+    return SLAM_OK;
+  }
+
   int ret = SLAM_OK;
   LOG(INFO) << "load  model file " << config_.global_model_path;
   gmodel_ = new GlobalModel();
@@ -249,6 +256,7 @@ int MiLocServicer::LoadModel()
     return ret;
   }
   LOG(INFO) << "load  model match success!";
+  is_model_loaded_ = true;
 
   return ret;
 }
@@ -730,6 +738,13 @@ int MiLocServicer::CheckResult(
 
 void MiLocServicer::ReleaseModel()
 {
+  if (!is_model_loaded_){
+    LOG(INFO) << "model is already release";
+    return;
+  }
+
+  LOG(INFO) << "release model";
+  
   if (mmodel_ != nullptr) {
     delete mmodel_;
     mmodel_ = nullptr;
@@ -742,6 +757,16 @@ void MiLocServicer::ReleaseModel()
     delete gmodel_;
     gmodel_ = nullptr;
   }
+
+  is_model_loaded_ = false;
+  
+  int dev_count = 0;
+  cudaSetDevice(dev_count);
+  cudaDeviceReset();
+  LOG(INFO) << "Cuda device reset complated. ";
+  malloc_trim(0);
+  LOG(INFO) << "Malloc trim complated. ";
+
 }
 
 MiLocServicer::~MiLocServicer()

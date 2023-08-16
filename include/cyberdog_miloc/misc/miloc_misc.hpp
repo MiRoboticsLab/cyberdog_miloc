@@ -148,6 +148,7 @@ private:
   std::string map_url_;
   int map_status_;
   int map_scene_;
+  bool is_model_loaded_;
 
   // Whether to create a new map or navigate
   bool is_creating_map_;
