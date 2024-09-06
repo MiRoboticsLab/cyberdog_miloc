@@ -18,12 +18,14 @@
 #include <cmath>
 #include <memory>
 #include <utility>
+#include <unistd.h>
 
 #include "rclcpp/executors/single_threaded_executor.hpp"
 #include "cv_bridge/cv_bridge.h"
 #include "tf2/utils.h"
-#include "cyberdog_common/cyberdog_log.hpp"
 
+#include "cyberdog_common/cyberdog_log.hpp"
+#include "cyberdog_common/cyberdog_toml.hpp"
 #include "cyberdog_miloc/miloc_server.hpp"
 
 namespace cyberdog
@@ -109,10 +111,6 @@ int MilocServer::Init()
   connector_sub_ = create_subscription<protocol::msg::ConnectorStatus>(
     "connector_state", rclcpp::SystemDefaultsQoS(),
     std::bind(&MilocServer::ModelDownloadCallback, this, std::placeholders::_1));
-
-  miloc_model_ = std::make_shared<cyberdog::common::cyberdog_model>(
-    "models", false, "2.0",
-    "/SDCARD/", "miloc");
 
   reloc_failure_threshold_ = param<int>(this, "reloc_failure_threshold", 20);
 
@@ -216,18 +214,26 @@ int MilocServer::ModelCheck()
   std::string local_config_dir = "/SDCARD/miloc/models/" + std::string("version.toml");
   std::string local_model_version{"0.0"};
 
+  toml::value value;
+
   if (access(local_config_dir.c_str(), F_OK) != 0) {
     local_model_version = "1.0";
+  
   } else {
-    bool ret = miloc_model_->Get_Model_Version(local_config_dir, local_model_version);
-    if (!ret) {
-      ERROR("get local model version fail...");
+
+    if (!cyberdog::common::CyberdogToml::ParseFile(std::string(local_config_dir), value)){
+      ERROR("parse toml file failed");
+      return SLAM_ERROR;
+    }
+
+    if (!cyberdog::common::CyberdogToml::Get(value, "version", local_model_version)) {
+      ERROR("fail to read key value from toml");
       return SLAM_ERROR;
     }
   }
 
   if (local_model_version.compare("2.0") < 0) {
-    ERROR("local model version less than 2.0, can not work, please update");
+    ERROR("local model version less than 2.0, can not work, please update in github");
     return SLAM_ERROR;
   }
 
@@ -238,31 +244,8 @@ void MilocServer::ModelDownloadCallback(const protocol::msg::ConnectorStatus::Sh
 {
   if (msg->is_internet && connector_sub_ != nullptr) {
     INFO("internet is ok, start to check miloc models");
-    miloc_model_->SetTimeout(600);
-    int32_t code = miloc_model_->UpdateModels();
-    if (0 == code) {
-      INFO("Update model from Fds success.");
-
-      if (miloc_model_->Load_Model_Check()) {
-        miloc_model_->Post_Process();
-        INFO("replace and remove temp model prepare load new model");
-      } else {
-        INFO("load model without replace new model");
-      }
-
-    } else if (5829 == code) {
-      INFO("model already downloads, do not need to update models");
-
-      if (miloc_model_->Load_Model_Check()) {
-        miloc_model_->Post_Process();
-        INFO("replace and remove temp model prepare load new model");
-      } else {
-        INFO("load model without replace new model");
-      }
-
-    } else {
-      ERROR("Update model from Fds fail.");
-    }
+    
+    //download models Need Implemented by miloc team
 
     connector_sub_.reset();
     connector_sub_ = nullptr;
@@ -524,6 +507,13 @@ void MilocServer::CreateMapCallback(
     ResetMiloc();
   }
 
+  if (ModelCheck() != SLAM_OK){
+    response->success = false;
+    INFO("model is not ready, please update model in github");
+    response->message = "model is not ready, please update model in github";
+    return;
+  }
+
   if (request->data) {
     while (!create_map_client_->wait_for_service(1s)) {
       INFO("Service not available, waiting again...");
@@ -532,6 +522,7 @@ void MilocServer::CreateMapCallback(
     request->data = true;
     create_map_client_->async_send_request(request);
   }
+
 
 
   Subscribe();
@@ -584,6 +575,9 @@ void MilocServer::FinishMapCallback(
           reconstruct_success = false;
           INFO("Something is wrong, reconstruction aborted");
         }
+      }else {
+        reconstruct_success = false;
+        INFO("Model is not ready");
       }
 
     } else if (MilocStatus::kRECONSTRUCTING == miloc_api_->GetMilocStatus()) {

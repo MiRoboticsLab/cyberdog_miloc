@@ -38,7 +38,6 @@
 #include "cyberdog_visions_interfaces/srv/map_config.hpp"
 #include "cyberdog_visions_interfaces/srv/map_param.hpp"
 #include "cyberdog_visions_interfaces/srv/finish_map.hpp"
-#include "cyberdog_common/cyberdog_model.hpp"
 #include "protocol/srv/map.hpp"
 #include "protocol/msg/connector_status.hpp"
 
@@ -172,7 +171,6 @@ private:
   int fail_num_ = 0;
   int reloc_failure_threshold_;
   bool immediately_reconstruct_;
-  std::shared_ptr<cyberdog::common::cyberdog_model> miloc_model_;
 
   rclcpp::Subscription<protocol::msg::ConnectorStatus>::SharedPtr connector_sub_;
   std::vector<std::unique_ptr<ImageSyncSub>> sync_subs_cam_;
