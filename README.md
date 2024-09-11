@@ -22,6 +22,22 @@ Depend on Jetpack 4.6，include CUDA 10.2、cuDNN 8.2.1、TensorRT 8.0.1
 colcon build --merge-install --install-base /opt/ros2/cyberdog
 ```
 
+## Miloc Models
+
+Miloc models needs to be manually updated from [GitHub](https://github.com/MiRoboticsLab/model_files/tree/main/miloc/models/2.0)
+
+```shell
+# delete old models
+rm -rf /SSD/miloc/models/*
+# down load 3 models  (global_models.trt local_model.trt match_models.trt) 
+# from GitHub to /SSD/miloc/models/
+
+# create version file and add version number
+touch /SSD/miloc/models/version.toml
+echo 'version = "2.0"' > /SSD/miloc/models/version.toml
+
+```
+
 ## RUN
 
 ```shell
